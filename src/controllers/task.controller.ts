@@ -9,7 +9,7 @@ export interface Task {
 
 // 2. Mock Database (Array of Tasks)
 let tasks: Task[] = [
-    { id: "1", title: "Learn Express setup", completed: true },
+    { id: "1", title: "Learn Express  setup", completed: true },
     { id: "2", title: "Build Task Manager", completed: false }
 ];
 
@@ -21,9 +21,7 @@ export const getAllTasks = (req: Request, res: Response) => {
     });
 };
 
-export const healthCheck = (req: Request, res: Response) => {
-    res.status(200).json({ status: "Server is healthy and running!" });
-};
+
 
 export const throwError = (req: Request, res: Response) => {
     res.status(400).json({ message: "Something went wrong!" });
