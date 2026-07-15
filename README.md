@@ -18,6 +18,7 @@ Welcome to the Task Manager API project! This repository documents my daily prog
 ## 📁 Repository Structure
 - `/src`: Contains all the application code (controllers, routes, middlewares).
 - `/docs`: Contains theoretical notes and explanations for every concept learned.
+- `/docs/interview_notes.md`: Contains the list of interview questions compiled daily.
 - `/activities`: Contains the daily homework assignments and challenges.
 
 ## 🚀 How to run locally

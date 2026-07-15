@@ -1,6 +1,6 @@
 import express, { type Application, type Request, type Response, type NextFunction } from 'express';
 import taskRoutes from './src/routes/task.routes.js';
-import { requestLogger } from './src/middlewares/logger.middleware.js';
+import morgan from 'morgan';
 import { errorHandler } from './src/middlewares/error.middleware.js';
 // Initialize Express App
 const app: Application = express();
@@ -8,8 +8,8 @@ const app: Application = express();
 // Middleware to parse JSON body data
 app.use(express.json());
 
-// Custom Logger Middleware (Runs on every request)
-app.use(requestLogger);
+// HTTP request logger middleware
+app.use(morgan('dev'));
 
 // Task Manager API Routes (Imported from src/routes)
 app.use('/api/tasks', taskRoutes);
