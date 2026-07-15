@@ -11,8 +11,8 @@ Welcome to the Task Manager API project! This repository documents my daily prog
 - [x] **Day 5:** Architecture & Folder Structure (Separating Controllers & Routes)
 - [x] **Day 6:** Custom Middleware (Built a Request Logger)
 - [x] **Day 7:** Third-Party Middleware (Morgan for logging)
-- [ ] **Day 8:** Advanced Routing (Req Params and Queries)
-- [ ] **Day 9:** Real Database Setup (MongoDB / Postgres)
+- [x] **Day 8:** Advanced Routing (Req Params and Queries)
+- [x] **Day 9:** Environment Variables (.env) & Config files
 - [ ] **Day 10:** ...and beyond!
 
 ## 📁 Repository Structure
