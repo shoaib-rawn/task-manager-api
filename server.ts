@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express, { type Application, type Request, type Response, type NextFunction } from 'express';
 import taskRoutes from './src/routes/task.routes.js';
 import morgan from 'morgan';
@@ -9,7 +10,8 @@ const app: Application = express();
 app.use(express.json());
 
 // HTTP request logger middleware
-app.use(morgan('dev'));
+const logFormat = process.env.NODE_ENV === 'production' ? 'combined' : 'dev';
+app.use(morgan(logFormat));
 
 // Task Manager API Routes (Imported from src/routes)
 app.use('/api/tasks', taskRoutes);
