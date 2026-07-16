@@ -271,4 +271,35 @@ Here are 10 critical interview questions covering what we have built and discuss
   If you sprinkle `process.env.DB_URL` throughout 50 different files, and that variable is missing from the `.env` file, your app might crash unpredictably deep inside a random file. By centralizing them in one configuration file, you can immediately check if all required variables exist right when the server starts. If a critical variable is missing, you can intentionally throw an error immediately ("Fail Fast"), and you can also provide safe default values all in one place.
 
 ---
-*Next update: Day 10 (Building Task CRUD Routes).*
+
+## 📅 Day 10: Building the Core Task CRUD Routes
+
+### Q26: What does the acronym CRUD stand for, and how do its operations map to RESTful HTTP methods?
+* **Answer:** 
+  CRUD stands for **Create, Read, Update, and Delete**. In a standard REST API, these database operations map directly to specific HTTP methods:
+  * **Create** ➔ `POST`
+  * **Read** ➔ `GET`
+  * **Update** ➔ `PUT` (or `PATCH`)
+  * **Delete** ➔ `DELETE`
+
+### Q27: What is the strict semantic difference between the `PUT` and `PATCH` HTTP methods?
+* **Answer:** 
+  Both are used for updating resources, but they have different rules:
+  * **`PUT`** is meant for **full replacement**. If a task has `title` and `completed` fields, and you send a `PUT` request with only the `title`, the server is technically supposed to wipe out the `completed` field (or revert it to default).
+  * **`PATCH`** is meant for **partial updates**. If you send a `PATCH` request with only the `title`, the server updates just the `title` and leaves all other existing fields exactly as they were. 
+  *(Note: While these are the strict REST definitions, many developers casually use `PUT` for partial updates in the real world).*
+
+### Q28: When successfully creating a new resource via a `POST` request, what HTTP status code should the server return?
+* **Answer:** 
+  The server should return `201 Created`. While returning a standard `200 OK` works and won't crash the app, `201 Created` is semantically correct. It explicitly communicates to the frontend client that their request resulted in a brand-new record being generated in the database.
+
+### Q29: Why do `POST` and `PUT` requests require `express.json()` middleware, but `GET` and `DELETE` requests usually do not?
+* **Answer:** 
+  `POST` and `PUT` operations require the client to send a payload of data (like a new task object) inside the **Request Body**. The `express.json()` middleware is necessary to intercept and parse that raw body stream into a usable JavaScript object (`req.body`). Conversely, `GET` and `DELETE` requests almost never use a body; they transmit their required data entirely through the URL (via route parameters like `/:id` or query strings like `?sort=asc`), meaning body-parsing middleware is ignored.
+
+### Q30: In our `updateTask` controller, why did modifying the object returned by `tasks.find()` automatically update the array? We never pushed it back in!
+* **Answer:** 
+  This happens because, in JavaScript, objects are passed by **reference**, not by value. When `tasks.find()` locates a task, it doesn't return a copy of the task; it returns a direct memory reference to the exact object sitting inside the array. Therefore, doing `task.title = "New Title"` instantly mutates the original object inside the array. No `.push()` or array reassignment is necessary!
+
+---
+*Next update: Day 11 (REST API Principles & JSON).*
