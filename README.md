@@ -13,7 +13,7 @@ Welcome to the Task Manager API project! This repository documents my daily prog
 - [x] **Day 7:** Third-Party Middleware (Morgan for logging)
 - [x] **Day 8:** Advanced Routing (Req Params and Queries)
 - [x] **Day 9:** Environment Variables (.env) & Config files
-- [ ] **Day 10:** ...and beyond!
+- [x] **Day 10:** Building the core Task Route structure (GET, POST, PUT, DELETE)
 
 ## 📁 Repository Structure
 - `/src`: Contains all the application code (controllers, routes, middlewares).
