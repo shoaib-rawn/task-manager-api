@@ -9,91 +9,75 @@ export interface Task {
 
 // 2. Mock Database (Array of Tasks)
 let tasks: Task[] = [
-    { id: "1", title: "Learn Express  setup", completed: true },
-    { id: "2", title: "Build Task Manager", completed: false }
+    { id: "1", title: "Learn Express setup", completed: true },
+    { id: "2", title: "Build Task Manager API", completed: false }
 ];
+
+// --- Helper Functions for Clean JSON Responses ---
+const sendSuccess = (res: Response, data?: any, message?: string, statusCode = 200) => {
+    res.status(statusCode).json({ success: true, message, data });
+};
+
+const sendError = (res: Response, message: string, statusCode = 400) => {
+    res.status(statusCode).json({ success: false, message });
+};
+// -----------------------------------------------
 
 // 3. Controller to get all tasks (with optional filtering)
 export const getAllTasks = (req: Request, res: Response) => {
     const { completed } = req.query;
-    
     let filteredTasks = tasks;
     
-    if (completed === "true") {
-        filteredTasks = tasks.filter(task => task.completed === true);
-    } else if (completed === "false") {
-        filteredTasks = tasks.filter(task => task.completed === false);
-    }
+    if (completed === "true") filteredTasks = tasks.filter(task => task.completed === true);
+    if (completed === "false") filteredTasks = tasks.filter(task => task.completed === false);
     
-    res.status(200).json({
-        message: "Successfully fetched tasks!",
-        tasks: filteredTasks
-    });
+    sendSuccess(res, filteredTasks);
 };
 
 // 4. Controller to get a single task by ID
 export const getTaskById = (req: Request, res: Response) => {
-    const { id } = req.params;
+    const task = tasks.find(t => t.id === req.params.id);
     
-    const task = tasks.find(t => t.id === id);
+    if (!task) return sendError(res, "Task not found", 404);
     
-    if (task) {
-        res.status(200).json(task);
-    } else {
-        res.status(404).json({ message: "Task not found" });
-    }
+    sendSuccess(res, task);
 };
-
 
 // 5. Controller to create a new task
 export const createTask = (req: Request, res: Response) => {
     const { title } = req.body;
     
-    if (!title) {
-        return res.status(400).json({ message: "Title is required" });
-    }
+    if (!title) return sendError(res, "Title is required", 400);
     
-    const newTask: Task = {
-        id: Date.now().toString(),
-        title,
-        completed: false
-    };
-    
+    const newTask: Task = { id: Date.now().toString(), title, completed: false };
     tasks.push(newTask);
-    res.status(201).json(newTask);
+    
+    sendSuccess(res, newTask, "Task created successfully", 201);
 };
 
 // 6. Controller to update an existing task
 export const updateTask = (req: Request, res: Response) => {
-    const { id } = req.params;
     const { title, completed } = req.body;
+    const task = tasks.find(t => t.id === req.params.id);
     
-    const task = tasks.find(t => t.id === id);
-    
-    if (!task) {
-        return res.status(404).json({ message: "Task not found" });
-    }
+    if (!task) return sendError(res, "Task not found", 404);
     
     task.title = title !== undefined ? title : task.title;
     task.completed = completed !== undefined ? completed : task.completed;
     
-    res.json(task);
+    sendSuccess(res, task);
 };
 
 // 7. Controller to delete a task
 export const deleteTask = (req: Request, res: Response) => {
-    const { id } = req.params;
+    const taskIndex = tasks.findIndex(t => t.id === req.params.id);
     
-    const taskIndex = tasks.findIndex(t => t.id === id);
-    
-    if (taskIndex === -1) {
-        return res.status(404).json({ message: "Task not found" });
-    }
+    if (taskIndex === -1) return sendError(res, "Task not found", 404);
     
     tasks.splice(taskIndex, 1);
-    res.json({ message: "Task deleted successfully" });
+    sendSuccess(res, null, "Task deleted successfully");
 };
 
 export const throwError = (req: Request, res: Response) => {
-    res.status(400).json({ message: "Something went wrong!" });
+    sendError(res, "Something went wrong!");
 };

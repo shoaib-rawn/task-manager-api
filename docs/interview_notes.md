@@ -302,4 +302,31 @@ Here are 10 critical interview questions covering what we have built and discuss
   This happens because, in JavaScript, objects are passed by **reference**, not by value. When `tasks.find()` locates a task, it doesn't return a copy of the task; it returns a direct memory reference to the exact object sitting inside the array. Therefore, doing `task.title = "New Title"` instantly mutates the original object inside the array. No `.push()` or array reassignment is necessary!
 
 ---
-*Next update: Day 11 (REST API Principles & JSON).*
+
+## 📅 Day 11: RESTful Principles & JSON Formatting
+
+### Q31: What is REST, and what are its core principles?
+* **Answer:** 
+  REST (Representational State Transfer) is an architectural style for designing networked APIs. Its core principles include:
+  1. **Client-Server Architecture:** Complete separation between the frontend UI and the backend data.
+  2. **Statelessness:** The server retains no memory of the client between requests.
+  3. **Uniform Interface:** Predictable URIs and standardized use of HTTP methods.
+
+### Q32: What exactly does it mean for an API to be "Stateless"?
+* **Answer:** 
+  Statelessness means that every single HTTP request from the client must contain all the information the server needs to process it. The server does not "remember" the client from previous requests. For example, if a user is logged in, they must attach their authentication token to every single request they send, because the server forgets who they are the moment the previous request finishes.
+
+### Q33: Why is it highly recommended to use a standard "JSON Envelope" (like JSend) instead of returning raw objects or arrays?
+* **Answer:** 
+  A standard envelope (e.g., `{ success: true, data: [...] }`) provides predictability for frontend developers. They always know exactly how to parse the response (checking `response.data.success` first), regardless of whether it's an error, a single object, or an array. It also makes the API scalable, allowing developers to easily add metadata (like pagination details) to the envelope without breaking the core `data` structure.
+
+### Q34: In a REST API, why is the endpoint `GET /api/deleteTask/:id` considered an anti-pattern?
+* **Answer:** 
+  It violates the Uniform Interface principle. In REST, the URL route should represent the **resource** itself (the noun, like `/api/tasks`), while the HTTP method should represent the **action** being taken (the verb, like `DELETE`). The correct and standard approach is `DELETE /api/tasks/:id`.
+
+### Q35: If a client requests a resource that does not exist, what should the response look like?
+* **Answer:** 
+  The HTTP status code must be `404 Not Found`. Additionally, the JSON envelope should cleanly indicate the failure so the frontend can display an error, for example: `{ "success": false, "message": "Task not found" }`.
+
+---
+*Next update: Day 12 (File System Mock DB).*
