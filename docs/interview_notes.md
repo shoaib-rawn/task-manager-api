@@ -329,4 +329,28 @@ Here are 10 critical interview questions covering what we have built and discuss
   The HTTP status code must be `404 Not Found`. Additionally, the JSON envelope should cleanly indicate the failure so the frontend can display an error, for example: `{ "success": false, "message": "Task not found" }`.
 
 ---
-*Next update: Day 12 (File System Mock DB).*
+
+## 📅 Day 12: File System & Data Persistence
+
+### Q36: Why can't we just store application data in a JavaScript array?
+* **Answer:** 
+  A JavaScript array is stored in the computer's volatile memory (RAM). This means every time the Node.js server restarts or crashes, all the data is permanently lost. For a real application, data must be **persistent** (saved permanently on a hard drive).
+
+### Q37: What is the Node.js `fs` module?
+* **Answer:** 
+  The `fs` (File System) module is a built-in Node.js module that allows your JavaScript code to interact with the server's hard drive. It provides methods to read, write, update, and delete physical files and folders.
+
+### Q38: What is the difference between `fs.readFileSync` and `fs.promises.readFile`?
+* **Answer:** 
+  `fs.readFileSync` is **synchronous (blocking)**. It completely halts the entire Node.js server until the file is read, making all other users wait. `fs.promises.readFile` is **asynchronous (non-blocking)**. It reads the file in the background, allowing the server to continue handling requests from other users simultaneously.
+
+### Q39: Why is synchronous (blocking) code considered bad practice in web servers?
+* **Answer:** 
+  Because Node.js runs on a **Single Thread**, if a synchronous operation (like reading a huge file) blocks that thread, the entire server freezes. No other user can connect or get a response until that operation finishes, leading to terrible performance and timeouts.
+
+### Q40: When you read a `.json` file using the `fs` module, what format is the data in, and how do you use it in JavaScript?
+* **Answer:** 
+  The `fs` module reads the file as plain **text (a string)**. To use it in JavaScript as an actual object or array, you must parse it using `JSON.parse(data)`. Conversely, before writing it back to the file, you must convert it back to a string using `JSON.stringify(data)`.
+
+---
+*Next update: Day 13.*
