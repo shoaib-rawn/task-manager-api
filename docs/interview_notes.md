@@ -352,5 +352,15 @@ Here are 10 critical interview questions covering what we have built and discuss
 * **Answer:** 
   The `fs` module reads the file as plain **text (a string)**. To use it in JavaScript as an actual object or array, you must parse it using `JSON.parse(data)`. Conversely, before writing it back to the file, you must convert it back to a string using `JSON.stringify(data)`.
 
+### Q41: In an Express controller, what happens when you pass an argument to `next()`, such as `next(error)`?
+* **Answer:** 
+  By default, `next()` simply passes control to the very next middleware in the stack. However, if you pass **any argument** to it (e.g., `next(error)`), Express assumes that a fatal error has occurred. It will instantly skip all remaining standard middlewares and route handlers, and jump directly to the **Centralized Error Handling Middleware** (the one with 4 parameters: `err, req, res, next`) to log the error and send a generic 500 response to the client.
+
+### Q42: In TypeScript, why do asynchronous functions have return types like `Promise<Task[]>` or `Promise<void>` instead of just `Task[]` or `void`?
+* **Answer:** 
+  Any function marked with the `async` keyword inherently runs in the background and must return a `Promise`. The syntax inside the angle brackets `< >` simply dictates what the Promise will yield when it successfully resolves. 
+  * `Promise<Task[]>` means: *"When I finish my background work, I will hand you an array of Tasks."*
+  * `Promise<void>` means: *"I will do some background work (like saving a file), but when I am done, I will return absolutely nothing (`void`)."*
+
 ---
 *Next update: Day 13.*

@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 
 import fs from 'fs/promises';
 import path from 'path';
@@ -29,89 +29,110 @@ const writeTasks = async (tasks: Task[]): Promise<void> => {
     await fs.writeFile(dataFilePath, jsonText, 'utf-8');
 };
 
-// --- HTTP Helper Functions ---
-const sendSuccess = (res: Response, data?: any, message?: string, statusCode = 200) => {
-    res.status(statusCode).json({ success: true, message, data });
-};
-
-const sendError = (res: Response, message: string, statusCode = 400) => {
-    res.status(statusCode).json({ success: false, message });
-};
-
 // 3. Controller to get all tasks
-export const getAllTasks = async (req: Request, res: Response) => {
-    const { completed } = req.query;
-    const tasks = await readTasks();
-    let filteredTasks = tasks;
+export const getAllTasks = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { completed } = req.query;
+        const tasks = await readTasks();
+        let filteredTasks = tasks;
 
-    if (completed === "true") filteredTasks = tasks.filter(task => task.completed === true);
-    if (completed === "false") filteredTasks = tasks.filter(task => task.completed === false);
+        if (completed === "true") filteredTasks = tasks.filter(task => task.completed === true);
+        if (completed === "false") filteredTasks = tasks.filter(task => task.completed === false);
 
-    sendSuccess(res, filteredTasks);
+        res.status(200).json({ success: true, data: filteredTasks });
+    } catch (error) {
+        next(error);
+    }
 };
 
 // 4. Controller to get a single task by ID
-export const getTaskById = async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const tasks = await readTasks();
-    const task = tasks.find(t => t.id === id);
+export const getTaskById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params;
+        const tasks = await readTasks();
+        const task = tasks.find(t => t.id === id);
 
-    if (!task) return sendError(res, "Task not found", 404);
+        if (!task) {
+            return res.status(404).json({ success: false, message: "Task not found" });
+        }
 
-    sendSuccess(res, task);
+        res.status(200).json({ success: true, data: task });
+    } catch (error) {
+        next(error);
+    }
 };
 
 // 5. Controller to create a new task
-export const createTask = async (req: Request, res: Response) => {
-    const { title } = req.body;
-    if (!title) return sendError(res, "Title is required", 400);
+export const createTask = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { title } = req.body;
+        
+        if (!title) {
+            return res.status(400).json({ success: false, message: "Title is required" });
+        }
 
-    const tasks = await readTasks();
-    const newTask: Task = {
-        id: Date.now().toString(),
-        title,
-        completed: false
-    };
+        const tasks = await readTasks();
+        const newTask: Task = {
+            id: Date.now().toString(),
+            title,
+            completed: false
+        };
 
-    tasks.push(newTask);
-    await writeTasks(tasks);
+        tasks.push(newTask);
+        await writeTasks(tasks);
 
-    sendSuccess(res, newTask, "Task created successfully", 201);
+        res.status(201).json({ success: true, message: "Task created successfully", data: newTask });
+    } catch (error) {
+        next(error);
+    }
 };
 
 // 6. Controller to update an existing task
-export const updateTask = async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { title, completed } = req.body;
-    
-    const tasks = await readTasks();
-    const task = tasks.find(t => t.id === id);
+export const updateTask = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params;
+        const { title, completed } = req.body;
+        
+        const tasks = await readTasks();
+        const task = tasks.find(t => t.id === id);
 
-    if (!task) return sendError(res, "Task not found", 404);
+        if (!task) {
+            return res.status(404).json({ success: false, message: "Task not found" });
+        }
 
-    task.title = title !== undefined ? title : task.title;
-    task.completed = completed !== undefined ? completed : task.completed;
-    
-    await writeTasks(tasks);
+        task.title = title !== undefined ? title : task.title;
+        task.completed = completed !== undefined ? completed : task.completed;
+        
+        await writeTasks(tasks);
 
-    sendSuccess(res, task);
+        res.status(200).json({ success: true, data: task });
+    } catch (error) {
+        next(error);
+    }
 };
 
 // 7. Controller to delete a task
-export const deleteTask = async (req: Request, res: Response) => {
-    const { id } = req.params;
-    
-    const tasks = await readTasks();
-    const taskIndex = tasks.findIndex(t => t.id === id);
+export const deleteTask = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params;
+        
+        const tasks = await readTasks();
+        const taskIndex = tasks.findIndex(t => t.id === id);
 
-    if (taskIndex === -1) return sendError(res, "Task not found", 404);
+        if (taskIndex === -1) {
+            return res.status(404).json({ success: false, message: "Task not found" });
+        }
 
-    tasks.splice(taskIndex, 1);
-    await writeTasks(tasks);
-    
-    sendSuccess(res, null, "Task deleted successfully");
+        tasks.splice(taskIndex, 1);
+        await writeTasks(tasks);
+        
+        res.status(200).json({ success: true, message: "Task deleted successfully" });
+    } catch (error) {
+        next(error);
+    }
 };
 
-export const throwError = (req: Request, res: Response) => {
-    sendError(res, "Something went wrong!");
+export const throwError = (req: Request, res: Response, next: NextFunction) => {
+    const error = new Error("Something went wrong!");
+    next(error);
 };
