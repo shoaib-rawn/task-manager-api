@@ -1,0 +1,12 @@
+[
+  {
+    "id": "1",
+    "title": "Learn Express setup",
+    "completed": true
+  },
+  {
+    "id": "2",
+    "title": "Build Task Manager API",
+    "completed": false
+  }
+]
