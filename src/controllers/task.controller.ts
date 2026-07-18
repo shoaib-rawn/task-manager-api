@@ -66,10 +66,6 @@ export const getTaskById = async (req: Request, res: Response, next: NextFunctio
 export const createTask = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { title } = req.body;
-        
-        if (!title) {
-            return res.status(400).json({ success: false, message: "Title is required" });
-        }
 
         const tasks = await readTasks();
         const newTask: Task = {
