@@ -29,17 +29,39 @@ const writeTasks = async (tasks: Task[]): Promise<void> => {
     await fs.writeFile(dataFilePath, jsonText, 'utf-8');
 };
 
-// 3. Controller to get all tasks
-export const getAllTasks = async (req: Request, res: Response, next: NextFunction) => {
+// 3. Controller to get all tasks (with Filtering and Pagination)
+export const getTasks = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { completed } = req.query;
-        const tasks = await readTasks();
-        let filteredTasks = tasks;
+        let tasks = await readTasks();
 
-        if (completed === "true") filteredTasks = tasks.filter(task => task.completed === true);
-        if (completed === "false") filteredTasks = tasks.filter(task => task.completed === false);
+        // 1. Filter by completed status (if provided)
+        if (completed === "true") tasks = tasks.filter(task => task.completed === true);
+        if (completed === "false") tasks = tasks.filter(task => task.completed === false);
 
-        res.status(200).json({ success: true, data: filteredTasks });
+        // 2. Extract pagination query params with defaults
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+
+        // 3. Calculate start and end indexes
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+
+        // 4. Slice the filtered database array
+        const paginatedTasks = tasks.slice(startIndex, endIndex);
+
+        // 5. Return the data and helpful metadata
+        res.status(200).json({
+            success: true,
+            message: "Tasks retrieved successfully",
+            pagination: {
+                currentPage: page,
+                tasksPerPage: limit,
+                totalTasks: tasks.length,
+                totalPages: Math.ceil(tasks.length / limit)
+            },
+            data: paginatedTasks
+        });
     } catch (error) {
         next(error);
     }
