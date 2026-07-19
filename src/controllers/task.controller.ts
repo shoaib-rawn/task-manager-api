@@ -11,6 +11,7 @@ export interface Task {
     id: string;
     title: string;
     completed: boolean;
+    createdAt?: string;
 }
 
 // --- File System Helper Functions ---
@@ -32,14 +33,32 @@ const writeTasks = async (tasks: Task[]): Promise<void> => {
 // 3. Controller to get all tasks (with Filtering and Pagination)
 export const getTasks = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        // 1. Extract query params with defaults
         const { completed } = req.query;
+        const sortBy = (req.query.sortBy as string) || 'createdAt';
+        const order = (req.query.order as string) || 'desc';
+
         let tasks = await readTasks();
 
-        // 1. Filter by completed status (if provided)
+        // 2. Filter by completed status
         if (completed === "true") tasks = tasks.filter(task => task.completed === true);
         if (completed === "false") tasks = tasks.filter(task => task.completed === false);
 
-        // 2. Extract pagination query params with defaults
+        // 3. Sort the filtered array
+        tasks.sort((a, b) => {
+            if (sortBy === 'createdAt') {
+                const dateA = new Date(a.createdAt || 0).getTime();
+                const dateB = new Date(b.createdAt || 0).getTime();
+                return order === 'desc' ? dateB - dateA : dateA - dateB;
+            } else if (sortBy === 'title') {
+                if (a.title < b.title) return order === 'desc' ? 1 : -1;
+                if (a.title > b.title) return order === 'desc' ? -1 : 1;
+                return 0;
+            }
+            return 0;
+        });
+
+        // 4. Extract pagination query params
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 10;
 
@@ -93,7 +112,8 @@ export const createTask = async (req: Request, res: Response, next: NextFunction
         const newTask: Task = {
             id: Date.now().toString(),
             title,
-            completed: false
+            completed: false,
+            createdAt: new Date().toISOString()
         };
 
         tasks.push(newTask);

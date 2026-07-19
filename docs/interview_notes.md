@@ -363,4 +363,52 @@ Here are 10 critical interview questions covering what we have built and discuss
   * `Promise<void>` means: *"I will do some background work (like saving a file), but when I am done, I will return absolutely nothing (`void`)."*
 
 ---
-*Next update: Day 13.*
+
+## 📅 Day 13: Input Validation (Zod)
+
+### Q43: Why shouldn't we trust data coming from the client?
+* **Answer:** 
+  Clients (whether users, scripts, or malicious actors) can send anything in an HTTP request. If you expect a `title` string but they send an array or an SQL injection payload, and you don't validate it, your server will crash or your database will be compromised. "Never trust the client" is the golden rule of backend security.
+
+### Q44: What is Zod, and why is it preferred over manual `if/else` checks for validation?
+* **Answer:** 
+  Zod is a TypeScript-first schema declaration and validation library. Instead of writing dozens of `if (!req.body.title || typeof req.body.title !== 'string')` checks, you define a single "Schema" (a blueprint). Zod automatically validates the incoming data against the blueprint and provides excellent, human-readable error messages if it fails.
+
+### Q45: How does a Validation Middleware work in Express?
+* **Answer:** 
+  It is a Higher-Order Function (a function that returns a middleware). You pass a Zod schema into the function. The middleware intercepts the request, runs `schema.parseAsync(req.body)`, and if the data is valid, it calls `next()` to pass control to the controller. If the data is invalid, it catches the `ZodError` and immediately returns a `400 Bad Request` response, preventing the bad data from ever reaching the controller.
+
+---
+
+## 📅 Day 14: Pagination
+
+### Q46: What is Pagination and why is it crucial for REST APIs?
+* **Answer:** 
+  Pagination is the process of dividing a large dataset into smaller chunks (pages). It is crucial because if a database has 10 million records and a user requests them all, sending them in a single massive JSON response will overload the server's memory, consume massive bandwidth, and crash the user's browser.
+
+### Q47: How is Pagination typically implemented using Query Parameters?
+* **Answer:** 
+  The client sends `page` (the current page number) and `limit` (the number of items per page) in the URL query string (e.g., `?page=2&limit=10`). The backend calculates the starting index and ending index based on these parameters and returns only that specific slice of data.
+
+### Q48: What metadata should a paginated API response include alongside the data array?
+* **Answer:** 
+  A good API should always return pagination metadata so the frontend knows how to build its UI (like "Next" and "Previous" buttons). This usually includes: `currentPage`, `itemsPerPage`, `totalItems`, and `totalPages`.
+
+---
+
+## 📅 Day 15: Filtering & Sorting
+
+### Q49: What is the correct "Order of Operations" when a user requests Filtering, Sorting, and Pagination all at once?
+* **Answer:** 
+  The operations **must** be executed in this exact order:
+  1. **Filter:** Remove the data the user doesn't want (e.g., removing uncompleted tasks).
+  2. **Sort:** Organize the remaining data (e.g., sorting the completed tasks by date).
+  3. **Paginate:** Slice the organized data to return only the requested page.
+  Doing it in any other order (like paginating *before* sorting) will result in broken, inaccurate data.
+
+### Q50: How do you handle default values for query parameters if the user doesn't provide them?
+* **Answer:** 
+  If a user visits `/api/tasks` without query parameters, the backend should always fall back to sensible defaults to prevent the app from breaking. For example, using the logical OR operator: `const page = parseInt(req.query.page) || 1;` and `const sortBy = req.query.sortBy || 'createdAt';`.
+
+---
+*Next update: Day 16.*

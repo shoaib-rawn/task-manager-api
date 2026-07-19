@@ -233,3 +233,24 @@ Once you do this the first time, Git remembers the link! For all future pushes o
 ```bash
 git push
 ```
+
+---
+
+## 5. Professional Git Flow (`main` vs `dev`)
+
+**The Scenario:**
+You are working on a new feature branch every day (`feature/pagination`, `feature/sorting`) and opening Pull Requests (PRs). You are wondering if you should merge these daily PRs directly into the `main` branch.
+
+**Trunk-Based Development (Solo Projects):**
+Merging daily feature branches straight into `main` is completely fine for solo side projects! Many indie developers use this because it is fast.
+
+**Professional Git Flow (Real Companies):**
+In a professional environment, merging daily work into `main` is dangerous. If a bug sneaks in, the website breaks for actual customers. Instead, companies use this flow:
+
+1. **`main` (Production):** This is the live code for real users. You almost *never* merge daily work here.
+2. **`dev` (Staging/Testing):** This is the safe zone. All backend engineers merge their daily feature branches here. QA (Quality Assurance) testers test the API here to ensure nothing is broken.
+3. **`feature/*`:** Your daily working branches.
+
+**The Workflow:**
+1. **Daily:** Branch off `dev` ➔ `feature/pagination` ➔ Push to GitHub ➔ PR into `dev` (NOT `main`).
+2. **End of Sprint/Week (Release Day):** Once `dev` has all the new features (Pagination, Sorting, Validation) and is thoroughly tested, you open ONE massive Pull Request: **`dev` ➔ `main`**. This pushes everything to production at once safely.
