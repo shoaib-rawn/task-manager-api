@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { getAllTasks, getTaskById, createTask, updateTask, deleteTask } from '../controllers/task.controller.js';
+import { validate } from '../middlewares/validate.js';
+import { createTaskSchema } from '../validators/task.validator.js';
 
 const router = Router();
 
@@ -7,7 +9,7 @@ const router = Router();
 router.get('/', getAllTasks);
 
 // Route: POST /api/tasks/
-router.post('/', createTask);
+router.post('/', validate(createTaskSchema), createTask);
 
 // Route: GET /api/tasks/:id
 router.get('/:id', getTaskById);
