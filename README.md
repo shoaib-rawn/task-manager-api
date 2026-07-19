@@ -17,6 +17,7 @@ Welcome to the Task Manager API project! This repository documents my daily prog
 - [x] **Day 11:** Deep dive into RESTful principles & JSON formatting
 - [x] **Day 12:** File System (FS) module to save tasks to a local file (Mock DB)
 - [x] **Day 13:** Zod Validation
+- [x] **Day 14:** Pagination
 
 ## 📁 Repository Structure
 - `/src`: Contains all the application code (controllers, routes, middlewares).
