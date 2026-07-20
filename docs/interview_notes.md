@@ -422,7 +422,29 @@ Here are 10 critical interview questions covering what we have built and discuss
 * **Answer:** 
   By default, Express cannot parse `multipart/form-data` requests. If a client sends an image, Express will just see unreadable binary gibberish. Multer is a third-party Node.js middleware specifically designed to parse `multipart/form-data`. It intercepts the request, extracts the binary file chunks, assembles them, saves the physical file to the server's hard drive, and attaches the file's metadata to the `req.file` object for the controller to use.
 
-### Q53: How do you handle a scenario where a user needs to upload multiple different types of files (e.g., a Profile Picture and a PDF Resume) in a single request?
+### Q53: How do you configure Multer middleware for a single file upload in a route?
+* **Answer:** 
+  You use the `upload.single('fieldname')` method as a middleware. The string passed to it must exactly match the Key name used in the frontend's `form-data` request.
+  ```typescript
+  import { upload } from '../middlewares/upload.middleware.js';
+  
+  // This expects exactly one file attached to the 'image' field
+  router.post('/tasks', upload.single('image'), createTask);
+  ```
+
+### Q54: Where does Multer store the uploaded file information, and how do you access it in the controller?
+* **Answer:** 
+  For a single file upload, Multer automatically saves the physical file to the hard drive, and then attaches an object containing the file's metadata to `req.file`. The controller can then read `req.file.filename` to save the path to the database.
+  ```typescript
+  export const createTask = async (req: Request, res: Response) => {
+      // If a file was uploaded, generate the URL path string
+      const imageUrl = req.file ? '/uploads/' + req.file.filename : undefined;
+      
+      // Save imageUrl to database...
+  };
+  ```
+
+### Q55: How do you handle a scenario where a user needs to upload multiple different types of files (e.g., a Profile Picture and a PDF Resume) in a single request?
 * **Answer:** 
   Instead of using `upload.single('image')`, you would use Multer's `upload.fields()` method. You define an array of expected fields (e.g., `[{ name: 'profilePic', maxCount: 1 }, { name: 'resume', maxCount: 1 }]`). Multer will then process all of them and provide a `req.files` object containing arrays for each specific field name, allowing the controller to safely route the different files to their respective database columns.
 
