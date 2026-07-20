@@ -271,4 +271,182 @@ Here are 10 critical interview questions covering what we have built and discuss
   If you sprinkle `process.env.DB_URL` throughout 50 different files, and that variable is missing from the `.env` file, your app might crash unpredictably deep inside a random file. By centralizing them in one configuration file, you can immediately check if all required variables exist right when the server starts. If a critical variable is missing, you can intentionally throw an error immediately ("Fail Fast"), and you can also provide safe default values all in one place.
 
 ---
-*Next update: Day 10 (Building Task CRUD Routes).*
+
+## 📅 Day 10: Building the Core Task CRUD Routes
+
+### Q26: What does the acronym CRUD stand for, and how do its operations map to RESTful HTTP methods?
+* **Answer:** 
+  CRUD stands for **Create, Read, Update, and Delete**. In a standard REST API, these database operations map directly to specific HTTP methods:
+  * **Create** ➔ `POST`
+  * **Read** ➔ `GET`
+  * **Update** ➔ `PUT` (or `PATCH`)
+  * **Delete** ➔ `DELETE`
+
+### Q27: What is the strict semantic difference between the `PUT` and `PATCH` HTTP methods?
+* **Answer:** 
+  Both are used for updating resources, but they have different rules:
+  * **`PUT`** is meant for **full replacement**. If a task has `title` and `completed` fields, and you send a `PUT` request with only the `title`, the server is technically supposed to wipe out the `completed` field (or revert it to default).
+  * **`PATCH`** is meant for **partial updates**. If you send a `PATCH` request with only the `title`, the server updates just the `title` and leaves all other existing fields exactly as they were. 
+  *(Note: While these are the strict REST definitions, many developers casually use `PUT` for partial updates in the real world).*
+
+### Q28: When successfully creating a new resource via a `POST` request, what HTTP status code should the server return?
+* **Answer:** 
+  The server should return `201 Created`. While returning a standard `200 OK` works and won't crash the app, `201 Created` is semantically correct. It explicitly communicates to the frontend client that their request resulted in a brand-new record being generated in the database.
+
+### Q29: Why do `POST` and `PUT` requests require `express.json()` middleware, but `GET` and `DELETE` requests usually do not?
+* **Answer:** 
+  `POST` and `PUT` operations require the client to send a payload of data (like a new task object) inside the **Request Body**. The `express.json()` middleware is necessary to intercept and parse that raw body stream into a usable JavaScript object (`req.body`). Conversely, `GET` and `DELETE` requests almost never use a body; they transmit their required data entirely through the URL (via route parameters like `/:id` or query strings like `?sort=asc`), meaning body-parsing middleware is ignored.
+
+### Q30: In our `updateTask` controller, why did modifying the object returned by `tasks.find()` automatically update the array? We never pushed it back in!
+* **Answer:** 
+  This happens because, in JavaScript, objects are passed by **reference**, not by value. When `tasks.find()` locates a task, it doesn't return a copy of the task; it returns a direct memory reference to the exact object sitting inside the array. Therefore, doing `task.title = "New Title"` instantly mutates the original object inside the array. No `.push()` or array reassignment is necessary!
+
+---
+
+## 📅 Day 11: RESTful Principles & JSON Formatting
+
+### Q31: What is REST, and what are its core principles?
+* **Answer:** 
+  REST (Representational State Transfer) is an architectural style for designing networked APIs. Its core principles include:
+  1. **Client-Server Architecture:** Complete separation between the frontend UI and the backend data.
+  2. **Statelessness:** The server retains no memory of the client between requests.
+  3. **Uniform Interface:** Predictable URIs and standardized use of HTTP methods.
+
+### Q32: What exactly does it mean for an API to be "Stateless"?
+* **Answer:** 
+  Statelessness means that every single HTTP request from the client must contain all the information the server needs to process it. The server does not "remember" the client from previous requests. For example, if a user is logged in, they must attach their authentication token to every single request they send, because the server forgets who they are the moment the previous request finishes.
+
+### Q33: Why is it highly recommended to use a standard "JSON Envelope" (like JSend) instead of returning raw objects or arrays?
+* **Answer:** 
+  A standard envelope (e.g., `{ success: true, data: [...] }`) provides predictability for frontend developers. They always know exactly how to parse the response (checking `response.data.success` first), regardless of whether it's an error, a single object, or an array. It also makes the API scalable, allowing developers to easily add metadata (like pagination details) to the envelope without breaking the core `data` structure.
+
+### Q34: In a REST API, why is the endpoint `GET /api/deleteTask/:id` considered an anti-pattern?
+* **Answer:** 
+  It violates the Uniform Interface principle. In REST, the URL route should represent the **resource** itself (the noun, like `/api/tasks`), while the HTTP method should represent the **action** being taken (the verb, like `DELETE`). The correct and standard approach is `DELETE /api/tasks/:id`.
+
+### Q35: If a client requests a resource that does not exist, what should the response look like?
+* **Answer:** 
+  The HTTP status code must be `404 Not Found`. Additionally, the JSON envelope should cleanly indicate the failure so the frontend can display an error, for example: `{ "success": false, "message": "Task not found" }`.
+
+---
+
+## 📅 Day 12: File System & Data Persistence
+
+### Q36: Why can't we just store application data in a JavaScript array?
+* **Answer:** 
+  A JavaScript array is stored in the computer's volatile memory (RAM). This means every time the Node.js server restarts or crashes, all the data is permanently lost. For a real application, data must be **persistent** (saved permanently on a hard drive).
+
+### Q37: What is the Node.js `fs` module?
+* **Answer:** 
+  The `fs` (File System) module is a built-in Node.js module that allows your JavaScript code to interact with the server's hard drive. It provides methods to read, write, update, and delete physical files and folders.
+
+### Q38: What is the difference between `fs.readFileSync` and `fs.promises.readFile`?
+* **Answer:** 
+  `fs.readFileSync` is **synchronous (blocking)**. It completely halts the entire Node.js server until the file is read, making all other users wait. `fs.promises.readFile` is **asynchronous (non-blocking)**. It reads the file in the background, allowing the server to continue handling requests from other users simultaneously.
+
+### Q39: Why is synchronous (blocking) code considered bad practice in web servers?
+* **Answer:** 
+  Because Node.js runs on a **Single Thread**, if a synchronous operation (like reading a huge file) blocks that thread, the entire server freezes. No other user can connect or get a response until that operation finishes, leading to terrible performance and timeouts.
+
+### Q40: When you read a `.json` file using the `fs` module, what format is the data in, and how do you use it in JavaScript?
+* **Answer:** 
+  The `fs` module reads the file as plain **text (a string)**. To use it in JavaScript as an actual object or array, you must parse it using `JSON.parse(data)`. Conversely, before writing it back to the file, you must convert it back to a string using `JSON.stringify(data)`.
+
+### Q41: In an Express controller, what happens when you pass an argument to `next()`, such as `next(error)`?
+* **Answer:** 
+  By default, `next()` simply passes control to the very next middleware in the stack. However, if you pass **any argument** to it (e.g., `next(error)`), Express assumes that a fatal error has occurred. It will instantly skip all remaining standard middlewares and route handlers, and jump directly to the **Centralized Error Handling Middleware** (the one with 4 parameters: `err, req, res, next`) to log the error and send a generic 500 response to the client.
+
+### Q42: In TypeScript, why do asynchronous functions have return types like `Promise<Task[]>` or `Promise<void>` instead of just `Task[]` or `void`?
+* **Answer:** 
+  Any function marked with the `async` keyword inherently runs in the background and must return a `Promise`. The syntax inside the angle brackets `< >` simply dictates what the Promise will yield when it successfully resolves. 
+  * `Promise<Task[]>` means: *"When I finish my background work, I will hand you an array of Tasks."*
+  * `Promise<void>` means: *"I will do some background work (like saving a file), but when I am done, I will return absolutely nothing (`void`)."*
+
+---
+
+## 📅 Day 13: Input Validation (Zod)
+
+### Q43: Why shouldn't we trust data coming from the client?
+* **Answer:** 
+  Clients (whether users, scripts, or malicious actors) can send anything in an HTTP request. If you expect a `title` string but they send an array or an SQL injection payload, and you don't validate it, your server will crash or your database will be compromised. "Never trust the client" is the golden rule of backend security.
+
+### Q44: What is Zod, and why is it preferred over manual `if/else` checks for validation?
+* **Answer:** 
+  Zod is a TypeScript-first schema declaration and validation library. Instead of writing dozens of `if (!req.body.title || typeof req.body.title !== 'string')` checks, you define a single "Schema" (a blueprint). Zod automatically validates the incoming data against the blueprint and provides excellent, human-readable error messages if it fails.
+
+### Q45: How does a Validation Middleware work in Express?
+* **Answer:** 
+  It is a Higher-Order Function (a function that returns a middleware). You pass a Zod schema into the function. The middleware intercepts the request, runs `schema.parseAsync(req.body)`, and if the data is valid, it calls `next()` to pass control to the controller. If the data is invalid, it catches the `ZodError` and immediately returns a `400 Bad Request` response, preventing the bad data from ever reaching the controller.
+
+---
+
+## 📅 Day 14: Pagination
+
+### Q46: What is Pagination and why is it crucial for REST APIs?
+* **Answer:** 
+  Pagination is the process of dividing a large dataset into smaller chunks (pages). It is crucial because if a database has 10 million records and a user requests them all, sending them in a single massive JSON response will overload the server's memory, consume massive bandwidth, and crash the user's browser.
+
+### Q47: How is Pagination typically implemented using Query Parameters?
+* **Answer:** 
+  The client sends `page` (the current page number) and `limit` (the number of items per page) in the URL query string (e.g., `?page=2&limit=10`). The backend calculates the starting index and ending index based on these parameters and returns only that specific slice of data.
+
+### Q48: What metadata should a paginated API response include alongside the data array?
+* **Answer:** 
+  A good API should always return pagination metadata so the frontend knows how to build its UI (like "Next" and "Previous" buttons). This usually includes: `currentPage`, `itemsPerPage`, `totalItems`, and `totalPages`.
+
+---
+
+## 📅 Day 15: Filtering & Sorting
+
+### Q49: What is the correct "Order of Operations" when a user requests Filtering, Sorting, and Pagination all at once?
+* **Answer:** 
+  The operations **must** be executed in this exact order:
+  1. **Filter:** Remove the data the user doesn't want (e.g., removing uncompleted tasks).
+  2. **Sort:** Organize the remaining data (e.g., sorting the completed tasks by date).
+  3. **Paginate:** Slice the organized data to return only the requested page.
+  Doing it in any other order (like paginating *before* sorting) will result in broken, inaccurate data.
+
+### Q50: How do you handle default values for query parameters if the user doesn't provide them?
+* **Answer:** 
+  If a user visits `/api/tasks` without query parameters, the backend should always fall back to sensible defaults to prevent the app from breaking. For example, using the logical OR operator: `const page = parseInt(req.query.page) || 1;` and `const sortBy = req.query.sortBy || 'createdAt';`.
+
+---
+
+## 📅 Day 16: File Uploads & Multer
+
+### Q51: What is the difference between `application/json` and `multipart/form-data`?
+* **Answer:** 
+  `application/json` is used for sending plain text data (like strings, numbers, and booleans) formatted as a JSON object. However, JSON cannot transmit binary files (like images, videos, or PDFs). To send files from a frontend to a backend, the request must use `multipart/form-data`, which breaks the HTTP request into multiple distinct "parts" so text data and binary data can travel together.
+
+### Q52: What is Multer and why is it necessary in an Express application?
+* **Answer:** 
+  By default, Express cannot parse `multipart/form-data` requests. If a client sends an image, Express will just see unreadable binary gibberish. Multer is a third-party Node.js middleware specifically designed to parse `multipart/form-data`. It intercepts the request, extracts the binary file chunks, assembles them, saves the physical file to the server's hard drive, and attaches the file's metadata to the `req.file` object for the controller to use.
+
+### Q53: How do you configure Multer middleware for a single file upload in a route?
+* **Answer:** 
+  You use the `upload.single('fieldname')` method as a middleware. The string passed to it must exactly match the Key name used in the frontend's `form-data` request.
+  ```typescript
+  import { upload } from '../middlewares/upload.middleware.js';
+  
+  // This expects exactly one file attached to the 'image' field
+  router.post('/tasks', upload.single('image'), createTask);
+  ```
+
+### Q54: Where does Multer store the uploaded file information, and how do you access it in the controller?
+* **Answer:** 
+  For a single file upload, Multer automatically saves the physical file to the hard drive, and then attaches an object containing the file's metadata to `req.file`. The controller can then read `req.file.filename` to save the path to the database.
+  ```typescript
+  export const createTask = async (req: Request, res: Response) => {
+      // If a file was uploaded, generate the URL path string
+      const imageUrl = req.file ? '/uploads/' + req.file.filename : undefined;
+      
+      // Save imageUrl to database...
+  };
+  ```
+
+### Q55: How do you handle a scenario where a user needs to upload multiple different types of files (e.g., a Profile Picture and a PDF Resume) in a single request?
+* **Answer:** 
+  Instead of using `upload.single('image')`, you would use Multer's `upload.fields()` method. You define an array of expected fields (e.g., `[{ name: 'profilePic', maxCount: 1 }, { name: 'resume', maxCount: 1 }]`). Multer will then process all of them and provide a `req.files` object containing arrays for each specific field name, allowing the controller to safely route the different files to their respective database columns.
+
+---
+*Next update: Day 17.*

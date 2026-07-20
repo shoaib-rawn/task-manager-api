@@ -25,7 +25,7 @@
 - `[ ]` **Week 3 Revision:** Review REST, file system storage, input validation, and pagination (Merge dev ➔ main via PR)
 
 ## Week 4: Polish & Advanced Features
-- `[ ]` **Day 16:** Handling File Uploads (attaching a file/image to a task) **[Git Flow: `feature/file-upload`]**
+- `[x]` **Day 16:** Handling File Uploads (attaching a file/image to a task) **[Git Flow: `feature/file-upload`]**
 - `[ ]` **Day 17:** API Rate Limiting (preventing spam) **[Git Flow: `feature/rate-limiting`]**
 - `[ ]` **Day 18:** Refactoring code for best practices (DRY principle) **[Git Flow: `feature/refactoring`]**
 - `[ ]` **Day 19:** Writing API Documentation (Swagger/Postman docs) **[Git Flow: `feature/swagger-docs`]**
