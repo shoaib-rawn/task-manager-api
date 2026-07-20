@@ -12,6 +12,7 @@ export interface Task {
     title: string;
     completed: boolean;
     createdAt?: string;
+    imageUrl?: string;
 }
 
 // --- File System Helper Functions ---
@@ -107,6 +108,7 @@ export const getTaskById = async (req: Request, res: Response, next: NextFunctio
 export const createTask = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { title } = req.body;
+        const imageUrl = req.file ? '/uploads/' + req.file.filename : undefined;
 
         const tasks = await readTasks();
         const newTask: Task = {
@@ -115,6 +117,10 @@ export const createTask = async (req: Request, res: Response, next: NextFunction
             completed: false,
             createdAt: new Date().toISOString()
         };
+
+        if (req.file) {
+            newTask.imageUrl = '/uploads/' + req.file.filename;
+        }
 
         tasks.push(newTask);
         await writeTasks(tasks);
@@ -140,6 +146,21 @@ export const updateTask = async (req: Request, res: Response, next: NextFunction
 
         task.title = title !== undefined ? title : task.title;
         task.completed = completed !== undefined ? completed : task.completed;
+        
+        // If the user uploaded a new image, update it and delete the old one
+        if (req.file) {
+            // Delete the old image from the hard drive to save space!
+            if (task.imageUrl) {
+                const oldImagePath = path.join(process.cwd(), task.imageUrl);
+                try {
+                    await fs.unlink(oldImagePath);
+                } catch (err) {
+                    console.log("Could not delete old image:", err);
+                }
+            }
+            // Set the new image
+            task.imageUrl = '/uploads/' + req.file.filename;
+        }
         
         await writeTasks(tasks);
 
