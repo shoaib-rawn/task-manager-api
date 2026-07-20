@@ -11,6 +11,8 @@ export interface Task {
     id: string;
     title: string;
     completed: boolean;
+    createdAt?: string;
+    imageUrl?: string;
 }
 
 // --- File System Helper Functions ---
@@ -32,14 +34,32 @@ const writeTasks = async (tasks: Task[]): Promise<void> => {
 // 3. Controller to get all tasks (with Filtering and Pagination)
 export const getTasks = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        // 1. Extract query params with defaults
         const { completed } = req.query;
+        const sortBy = (req.query.sortBy as string) || 'createdAt';
+        const order = (req.query.order as string) || 'desc';
+
         let tasks = await readTasks();
 
-        // 1. Filter by completed status (if provided)
+        // 2. Filter by completed status
         if (completed === "true") tasks = tasks.filter(task => task.completed === true);
         if (completed === "false") tasks = tasks.filter(task => task.completed === false);
 
-        // 2. Extract pagination query params with defaults
+        // 3. Sort the filtered array
+        tasks.sort((a, b) => {
+            if (sortBy === 'createdAt') {
+                const dateA = new Date(a.createdAt || 0).getTime();
+                const dateB = new Date(b.createdAt || 0).getTime();
+                return order === 'desc' ? dateB - dateA : dateA - dateB;
+            } else if (sortBy === 'title') {
+                if (a.title < b.title) return order === 'desc' ? 1 : -1;
+                if (a.title > b.title) return order === 'desc' ? -1 : 1;
+                return 0;
+            }
+            return 0;
+        });
+
+        // 4. Extract pagination query params
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 10;
 
@@ -88,13 +108,19 @@ export const getTaskById = async (req: Request, res: Response, next: NextFunctio
 export const createTask = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { title } = req.body;
+        const imageUrl = req.file ? '/uploads/' + req.file.filename : undefined;
 
         const tasks = await readTasks();
         const newTask: Task = {
             id: Date.now().toString(),
             title,
-            completed: false
+            completed: false,
+            createdAt: new Date().toISOString()
         };
+
+        if (req.file) {
+            newTask.imageUrl = '/uploads/' + req.file.filename;
+        }
 
         tasks.push(newTask);
         await writeTasks(tasks);
@@ -120,6 +146,21 @@ export const updateTask = async (req: Request, res: Response, next: NextFunction
 
         task.title = title !== undefined ? title : task.title;
         task.completed = completed !== undefined ? completed : task.completed;
+        
+        // If the user uploaded a new image, update it and delete the old one
+        if (req.file) {
+            // Delete the old image from the hard drive to save space!
+            if (task.imageUrl) {
+                const oldImagePath = path.join(process.cwd(), task.imageUrl);
+                try {
+                    await fs.unlink(oldImagePath);
+                } catch (err) {
+                    console.log("Could not delete old image:", err);
+                }
+            }
+            // Set the new image
+            task.imageUrl = '/uploads/' + req.file.filename;
+        }
         
         await writeTasks(tasks);
 

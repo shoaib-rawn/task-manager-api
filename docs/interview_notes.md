@@ -363,4 +363,90 @@ Here are 10 critical interview questions covering what we have built and discuss
   * `Promise<void>` means: *"I will do some background work (like saving a file), but when I am done, I will return absolutely nothing (`void`)."*
 
 ---
-*Next update: Day 13.*
+
+## 📅 Day 13: Input Validation (Zod)
+
+### Q43: Why shouldn't we trust data coming from the client?
+* **Answer:** 
+  Clients (whether users, scripts, or malicious actors) can send anything in an HTTP request. If you expect a `title` string but they send an array or an SQL injection payload, and you don't validate it, your server will crash or your database will be compromised. "Never trust the client" is the golden rule of backend security.
+
+### Q44: What is Zod, and why is it preferred over manual `if/else` checks for validation?
+* **Answer:** 
+  Zod is a TypeScript-first schema declaration and validation library. Instead of writing dozens of `if (!req.body.title || typeof req.body.title !== 'string')` checks, you define a single "Schema" (a blueprint). Zod automatically validates the incoming data against the blueprint and provides excellent, human-readable error messages if it fails.
+
+### Q45: How does a Validation Middleware work in Express?
+* **Answer:** 
+  It is a Higher-Order Function (a function that returns a middleware). You pass a Zod schema into the function. The middleware intercepts the request, runs `schema.parseAsync(req.body)`, and if the data is valid, it calls `next()` to pass control to the controller. If the data is invalid, it catches the `ZodError` and immediately returns a `400 Bad Request` response, preventing the bad data from ever reaching the controller.
+
+---
+
+## 📅 Day 14: Pagination
+
+### Q46: What is Pagination and why is it crucial for REST APIs?
+* **Answer:** 
+  Pagination is the process of dividing a large dataset into smaller chunks (pages). It is crucial because if a database has 10 million records and a user requests them all, sending them in a single massive JSON response will overload the server's memory, consume massive bandwidth, and crash the user's browser.
+
+### Q47: How is Pagination typically implemented using Query Parameters?
+* **Answer:** 
+  The client sends `page` (the current page number) and `limit` (the number of items per page) in the URL query string (e.g., `?page=2&limit=10`). The backend calculates the starting index and ending index based on these parameters and returns only that specific slice of data.
+
+### Q48: What metadata should a paginated API response include alongside the data array?
+* **Answer:** 
+  A good API should always return pagination metadata so the frontend knows how to build its UI (like "Next" and "Previous" buttons). This usually includes: `currentPage`, `itemsPerPage`, `totalItems`, and `totalPages`.
+
+---
+
+## 📅 Day 15: Filtering & Sorting
+
+### Q49: What is the correct "Order of Operations" when a user requests Filtering, Sorting, and Pagination all at once?
+* **Answer:** 
+  The operations **must** be executed in this exact order:
+  1. **Filter:** Remove the data the user doesn't want (e.g., removing uncompleted tasks).
+  2. **Sort:** Organize the remaining data (e.g., sorting the completed tasks by date).
+  3. **Paginate:** Slice the organized data to return only the requested page.
+  Doing it in any other order (like paginating *before* sorting) will result in broken, inaccurate data.
+
+### Q50: How do you handle default values for query parameters if the user doesn't provide them?
+* **Answer:** 
+  If a user visits `/api/tasks` without query parameters, the backend should always fall back to sensible defaults to prevent the app from breaking. For example, using the logical OR operator: `const page = parseInt(req.query.page) || 1;` and `const sortBy = req.query.sortBy || 'createdAt';`.
+
+---
+
+## 📅 Day 16: File Uploads & Multer
+
+### Q51: What is the difference between `application/json` and `multipart/form-data`?
+* **Answer:** 
+  `application/json` is used for sending plain text data (like strings, numbers, and booleans) formatted as a JSON object. However, JSON cannot transmit binary files (like images, videos, or PDFs). To send files from a frontend to a backend, the request must use `multipart/form-data`, which breaks the HTTP request into multiple distinct "parts" so text data and binary data can travel together.
+
+### Q52: What is Multer and why is it necessary in an Express application?
+* **Answer:** 
+  By default, Express cannot parse `multipart/form-data` requests. If a client sends an image, Express will just see unreadable binary gibberish. Multer is a third-party Node.js middleware specifically designed to parse `multipart/form-data`. It intercepts the request, extracts the binary file chunks, assembles them, saves the physical file to the server's hard drive, and attaches the file's metadata to the `req.file` object for the controller to use.
+
+### Q53: How do you configure Multer middleware for a single file upload in a route?
+* **Answer:** 
+  You use the `upload.single('fieldname')` method as a middleware. The string passed to it must exactly match the Key name used in the frontend's `form-data` request.
+  ```typescript
+  import { upload } from '../middlewares/upload.middleware.js';
+  
+  // This expects exactly one file attached to the 'image' field
+  router.post('/tasks', upload.single('image'), createTask);
+  ```
+
+### Q54: Where does Multer store the uploaded file information, and how do you access it in the controller?
+* **Answer:** 
+  For a single file upload, Multer automatically saves the physical file to the hard drive, and then attaches an object containing the file's metadata to `req.file`. The controller can then read `req.file.filename` to save the path to the database.
+  ```typescript
+  export const createTask = async (req: Request, res: Response) => {
+      // If a file was uploaded, generate the URL path string
+      const imageUrl = req.file ? '/uploads/' + req.file.filename : undefined;
+      
+      // Save imageUrl to database...
+  };
+  ```
+
+### Q55: How do you handle a scenario where a user needs to upload multiple different types of files (e.g., a Profile Picture and a PDF Resume) in a single request?
+* **Answer:** 
+  Instead of using `upload.single('image')`, you would use Multer's `upload.fields()` method. You define an array of expected fields (e.g., `[{ name: 'profilePic', maxCount: 1 }, { name: 'resume', maxCount: 1 }]`). Multer will then process all of them and provide a `req.files` object containing arrays for each specific field name, allowing the controller to safely route the different files to their respective database columns.
+
+---
+*Next update: Day 17.*
