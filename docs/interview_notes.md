@@ -411,4 +411,20 @@ Here are 10 critical interview questions covering what we have built and discuss
   If a user visits `/api/tasks` without query parameters, the backend should always fall back to sensible defaults to prevent the app from breaking. For example, using the logical OR operator: `const page = parseInt(req.query.page) || 1;` and `const sortBy = req.query.sortBy || 'createdAt';`.
 
 ---
-*Next update: Day 16.*
+
+## 📅 Day 16: File Uploads & Multer
+
+### Q51: What is the difference between `application/json` and `multipart/form-data`?
+* **Answer:** 
+  `application/json` is used for sending plain text data (like strings, numbers, and booleans) formatted as a JSON object. However, JSON cannot transmit binary files (like images, videos, or PDFs). To send files from a frontend to a backend, the request must use `multipart/form-data`, which breaks the HTTP request into multiple distinct "parts" so text data and binary data can travel together.
+
+### Q52: What is Multer and why is it necessary in an Express application?
+* **Answer:** 
+  By default, Express cannot parse `multipart/form-data` requests. If a client sends an image, Express will just see unreadable binary gibberish. Multer is a third-party Node.js middleware specifically designed to parse `multipart/form-data`. It intercepts the request, extracts the binary file chunks, assembles them, saves the physical file to the server's hard drive, and attaches the file's metadata to the `req.file` object for the controller to use.
+
+### Q53: How do you handle a scenario where a user needs to upload multiple different types of files (e.g., a Profile Picture and a PDF Resume) in a single request?
+* **Answer:** 
+  Instead of using `upload.single('image')`, you would use Multer's `upload.fields()` method. You define an array of expected fields (e.g., `[{ name: 'profilePic', maxCount: 1 }, { name: 'resume', maxCount: 1 }]`). Multer will then process all of them and provide a `req.files` object containing arrays for each specific field name, allowing the controller to safely route the different files to their respective database columns.
+
+---
+*Next update: Day 17.*
