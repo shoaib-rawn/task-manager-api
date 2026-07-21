@@ -254,3 +254,45 @@ In a professional environment, merging daily work into `main` is dangerous. If a
 **The Workflow:**
 1. **Daily:** Branch off `dev` ➔ `feature/pagination` ➔ Push to GitHub ➔ PR into `dev` (NOT `main`).
 2. **End of Sprint/Week (Release Day):** Once `dev` has all the new features (Pagination, Sorting, Validation) and is thoroughly tested, you open ONE massive Pull Request: **`dev` ➔ `main`**. This pushes everything to production at once safely.
+
+---
+
+## 6. Amending Commits (Cleaning up mistakes)
+
+**The Scenario:**
+You just made a commit (e.g., `git commit -m "feat: add rate limiter"`). Ten seconds later, you realize you forgot to add a file, or you need to refactor a messy piece of code. You don't want to make a second commit called "Oops, fixed rate limiter" because it makes the Git history look unprofessional.
+
+**The Solution:**
+You can merge your new changes directly into the *previous* commit so it looks like you got it perfect the first time.
+
+```bash
+# 1. Add your forgotten or refactored files
+git add server.ts src/middlewares/rateLimiter.middleware.ts
+
+# 2. Amend the previous commit (the --no-edit flag keeps the original commit message)
+git commit --amend --no-edit
+
+# 3. If you already pushed the old commit to GitHub, you MUST force push to overwrite it
+git push --force origin feature/rate-limiting
+```
+*Warning: Never use `--force` on the `main` or `dev` branches if you are working with a team, as it deletes history. Only use it on your personal feature branches!*
+
+---
+
+## 7. GitHub Branch Protection (Protecting `main`)
+
+**The Scenario:**
+You see a yellow warning on GitHub saying your `main` branch is not protected.
+
+**Why it happens:**
+The `main` branch contains your live production code. If an engineer accidentally runs `git push --force origin main` or `git branch -D main`, the entire history of the project is instantly wiped out.
+
+**The Solution:**
+You must put a "lock" on the `main` branch in GitHub settings. 
+
+1. Go to **Settings > Branches** on GitHub.
+2. Click **Add branch protection rule** and type `main`.
+3. Check the box for **"Require a pull request before merging"**.
+4. Check the box for **"Do not allow bypassing the above settings"**.
+
+Once saved, nobody (not even the owner) can push code directly from the terminal to `main`, and nobody can force push or delete it. All changes MUST go through a Pull Request.
