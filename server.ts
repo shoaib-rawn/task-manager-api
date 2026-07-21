@@ -3,11 +3,16 @@ import express, { type Application, type Request, type Response, type NextFuncti
 import taskRoutes from './src/routes/task.routes.js';
 import morgan from 'morgan';
 import { errorHandler } from './src/middlewares/error.middleware.js';
+import { globalLimiter } from './src/middlewares/rateLimiter.middleware.js';
+
 // Initialize Express App
 const app: Application = express();
 
 // Middleware to parse JSON body data
 app.use(express.json());
+
+// Apply Rate Limiting to all requests
+app.use(globalLimiter);
 
 // HTTP request logger middleware
 const logFormat = process.env.NODE_ENV === 'production' ? 'combined' : 'dev';

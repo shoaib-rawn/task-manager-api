@@ -26,7 +26,7 @@
 
 ## Week 4: Polish & Advanced Features
 - `[x]` **Day 16:** Handling File Uploads (attaching a file/image to a task) **[Git Flow: `feature/file-upload`]**
-- `[ ]` **Day 17:** API Rate Limiting (preventing spam) **[Git Flow: `feature/rate-limiting`]**
+- `[x]` **Day 17:** API Rate Limiting (preventing spam) **[Git Flow: `feature/rate-limiting`]**
 - `[ ]` **Day 18:** Refactoring code for best practices (DRY principle) **[Git Flow: `feature/refactoring`]**
 - `[ ]` **Day 19:** Writing API Documentation (Swagger/Postman docs) **[Git Flow: `feature/swagger-docs`]**
 - `[ ]` **Day 20:** Project Review & Code Cleanup
