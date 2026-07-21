@@ -155,6 +155,18 @@ export const deleteTask = async (req: Request, res: Response, next: NextFunction
             return res.status(404).json({ success: false, message: "Task not found" });
         }
 
+        const taskToDelete = tasks[taskIndex];
+        
+        // Delete the image from the hard drive if it exists
+        if (taskToDelete.imageUrl) {
+            const imagePath = path.join(process.cwd(), taskToDelete.imageUrl);
+            try {
+                await fs.unlink(imagePath);
+            } catch (err) {
+                console.log("Could not delete orphaned image:", err);
+            }
+        }
+
         tasks.splice(taskIndex, 1);
         await writeTasks(tasks);
         
