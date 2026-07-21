@@ -66,3 +66,19 @@ if (process.env.NODE_ENV !== 'production') {
     setupSwagger(app);
 }
 ```
+
+## Task 7: Document Query Parameters
+If you do not document your query parameters, frontend developers will never know they can paginate or filter!
+1. Under the `GET /api/tasks` Swagger block, add a `parameters` array.
+2. Define `page`, `limit`, `completed`, `sortBy`, and `order`.
+3. Now, Swagger will give you text boxes and dropdowns to test filtering directly in the browser!
+
+## Task 8: Clean Up Terminal Logs
+Loading the Swagger UI downloads a lot of CSS and JS files in the background, which clutters your terminal logs.
+1. Open `server.ts`.
+2. Update your `morgan` logger to ignore the Swagger URL:
+```typescript
+app.use(morgan(logFormat, {
+    skip: (req, res) => req.originalUrl.startsWith('/api-docs')
+}));
+```

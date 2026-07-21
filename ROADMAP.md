@@ -39,6 +39,17 @@ This roadmap covers the **Yellow Tabs** from the roadmap.sh image while building
 
 ---
 
+## 🟣 Month 4: Project 4 - Parcel Tracking System API
+**Technologies Covered:** Advanced WebSockets, Webhooks, Role-Based Access Control (RBAC), Geographic Data (PostGIS/MongoDB Geospatial).
+**Goal:** Build a real-time logistics tracking system (like TCS, FedEx, or Amazon Logistics) with live package updates and geographic tracking.
+
+* **Week 13:** Advanced Database Relations (Couriers, Vehicles, Hubs, Parcels), generating Tracking Numbers.
+* **Week 14:** Event-Driven Architecture, Webhooks for status events ("Dispatched", "In Transit", "Delivered").
+* **Week 15:** Role-Based Access Control (Admin Dashboard, Courier App, Customer View), Barcode/QR Code generation.
+* **Week 16:** Real-Time Live Location updates using WebSockets and Geographic Data queries, Final Polish.
+
+---
+
 ## Format
 Every day will follow the same pattern:
 1. **Theory:** Brief explanation of the day's concept (saved in `/docs`).

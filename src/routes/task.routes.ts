@@ -39,6 +39,37 @@ const router = Router();
  *     summary: Retrieve a list of all tasks
  *     description: Fetches all tasks. Supports pagination (?page=1&limit=5) and filtering (?completed=true).
  *     tags: [Tasks]
+ *     parameters:
+ *       - in: query
+ *         name: completed
+ *         schema:
+ *           type: boolean
+ *         description: Filter tasks by completion status (true or false)
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: The page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 5
+ *         description: Number of tasks per page
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           default: createdAt
+ *         description: Field to sort by (e.g., createdAt, title)
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: Sort direction (asc or desc)
  *     responses:
  *       200:
  *         description: A JSON array of tasks.

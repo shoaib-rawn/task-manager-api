@@ -449,4 +449,55 @@ Here are 10 critical interview questions covering what we have built and discuss
   Instead of using `upload.single('image')`, you would use Multer's `upload.fields()` method. You define an array of expected fields (e.g., `[{ name: 'profilePic', maxCount: 1 }, { name: 'resume', maxCount: 1 }]`). Multer will then process all of them and provide a `req.files` object containing arrays for each specific field name, allowing the controller to safely route the different files to their respective database columns.
 
 ---
-*Next update: Day 17.*
+## 📅 Day 17: API Security & Rate Limiting
+
+### Q56: What is a DDoS attack, and how does API Rate Limiting prevent it?
+* **Answer:** 
+  A DDoS (Distributed Denial of Service) attack occurs when malicious actors flood an API with thousands of fake requests per second, causing the server's CPU and Memory to crash. API Rate Limiting prevents this by tracking the IP address of every incoming request. If a single IP address sends more requests than a defined threshold (e.g., 100 requests per 15 minutes), the server automatically blocks them, preserving resources for legitimate users.
+
+### Q57: In Express, how do you apply a global rate limit to all routes?
+* **Answer:** 
+  You use a middleware package like `express-rate-limit`. You define the configuration window and the maximum allowed requests. Then, you place `app.use(globalLimiter)` near the top of your `server.ts` file so that every incoming request passes through the limiter before hitting the route handlers.
+
+### Q58: What HTTP Status code is returned when a client exceeds the rate limit?
+* **Answer:** 
+  The server returns a `429 Too Many Requests` status code.
+
+---
+
+## 📅 Day 18: Architecture & Refactoring (DRY & SoC)
+
+### Q59: What does the DRY principle stand for, and why is it critical in software engineering?
+* **Answer:** 
+  DRY stands for "Don't Repeat Yourself." It dictates that every piece of logic should have a single, unambiguous representation in the system. If you find yourself copying and pasting the exact same database reading logic into 5 different controllers, you are violating DRY. It is critical because if a bug is found in that logic, a DRY codebase only requires one fix in one file, whereas repeated code requires tracking down and fixing the bug in 5 different places.
+
+### Q60: What is the Separation of Concerns (SoC), and how does the `utils` folder help achieve it?
+* **Answer:** 
+  Separation of Concerns is an architectural principle stating that different files/folders should have completely distinct responsibilities. A Controller should only care about HTTP Requests and Responses. It should not care about *how* the hard drive reads a file. The `utils` folder helps achieve this by holding isolated, reusable "helper" functions (like `readTasks()`). The controller simply calls the utility function, maintaining a clean separation of HTTP logic from file-system logic.
+
+### Q61: What is the difference between a `utils` folder and a `services` folder?
+* **Answer:** 
+  A `utils` folder holds small, generic, reusable helper functions that do not contain core business rules (e.g., formatting dates, generating IDs, reading raw files). A `services` folder holds complex **Business Logic** (e.g., verifying inventory, calculating taxes, and charging a credit card during an E-Commerce checkout). In a simple CRUD app, `utils` is enough, but enterprise apps heavily rely on a `services` layer to keep controllers clean.
+
+---
+
+## 📅 Day 19: API Documentation (Swagger)
+
+### Q62: Why is API Documentation crucial for Backend Developers to provide to Frontend Developers?
+* **Answer:** 
+  Without documentation, a frontend developer has no idea how to consume an API. They don't know the exact URL endpoints, whether to use GET or POST, what the expected JSON request body looks like, or what Query Parameters (like `?page=1`) are supported. Documentation acts as the instruction manual, allowing frontend and backend teams to work independently.
+
+### Q63: What is Swagger (OpenAPI) and how is it generated in an Express application?
+* **Answer:** 
+  Swagger (now officially OpenAPI) is the industry standard format for API documentation. It generates a beautiful, interactive web dashboard where developers can read about and directly test API routes. In Express, it is typically generated using `swagger-jsdoc` (which reads YAML comments written directly above route definitions) and `swagger-ui-express` (which renders the HTML/CSS dashboard).
+
+### Q64: Why is it dangerous to leave Swagger documentation exposed in a Production environment, and how do you secure it?
+* **Answer:** 
+  While Swagger is amazing for development teams, it is highly dangerous in a live Production environment because it acts as a perfect blueprint for hackers. It shows them exactly what endpoints exist and what data schemas to attack. To secure it, professional developers wrap the Swagger setup in an environment check: `if (process.env.NODE_ENV !== 'production') { setupSwagger(app); }`. This ensures the documentation is entirely hidden on the live internet.
+
+### Q65: What is "Deep Linking" in Swagger UI and why is it useful?
+* **Answer:** 
+  Deep Linking allows developers to share a specific URL (containing a hash anchor, like `#/Tasks/get_api_tasks`) that automatically scrolls the browser down to a specific route's documentation block. This saves immense time when collaborating with frontend developers over Slack, as they are taken directly to the specific endpoint rather than having to search a massive documentation page manually.
+
+---
+*End of Month 1 Project 1 Interview Notes.*
