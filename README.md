@@ -19,7 +19,8 @@ Welcome to the Task Manager API project! This repository documents my daily prog
 - [x] **Day 13:** Zod Validation
 - [x] **Day 14:** Pagination
 - [x] **Day 15:** Filtering & Sorting
-- [x] **Day 16:** Handling File Uploads (Multer)
+- [x] **Day 16:** Handling File Uploads (Multer) 
+- [x] **Day 17:** API Rate Limiting (preventing spam) **[Git Flow: `feature/rate-limiting`]** 
 
 ## 📁 Repository Structure
 - `/src`: Contains all the application code (controllers, routes, middlewares).
