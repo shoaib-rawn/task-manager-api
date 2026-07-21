@@ -25,8 +25,10 @@ app.use(morgan(logFormat, {
 app.use('/api/tasks', taskRoutes);
 
 
-// Setup Swagger API Documentation
-setupSwagger(app);
+// Setup Swagger API Documentation (Development only for security!)
+if (process.env.NODE_ENV !== 'production') {
+    setupSwagger(app);
+}
 
 // CENTRALIZED ERROR HANDLER (Must be the last middleware before app.listen)
 app.use(errorHandler);
