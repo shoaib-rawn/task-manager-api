@@ -7,6 +7,8 @@ export const errorHandler = (err: Error, req: Request, res: Response, next: Next
 
     // Respond with a clean JSON format and a 500 status code
     res.status(500).json({
-        error: err.message || "Internal Server Error"
+        error: err.message || "Internal Server Error",
+        // SECURITY TRICK: Only show the full stack trace if we are in development!
+        stack: process.env.NODE_ENV === 'production' ? null : err.stack
     });
 };
