@@ -499,5 +499,15 @@ Here are 10 critical interview questions covering what we have built and discuss
 * **Answer:** 
   Deep Linking allows developers to share a specific URL (containing a hash anchor, like `#/Tasks/get_api_tasks`) that automatically scrolls the browser down to a specific route's documentation block. This saves immense time when collaborating with frontend developers over Slack, as they are taken directly to the specific endpoint rather than having to search a massive documentation page manually.
 
+## 📅 Day 20: Code Cleanup & Refactoring
+
+### Q66: What is the "Boy Scout Rule" in software engineering?
+* **Answer:** 
+  The Boy Scout Rule states: "Always leave the code cleaner than you found it." In professional software development, this means that whenever you open a file to add a new feature or fix a bug, you should also take a moment to fix poor variable names, delete unused imports, or add missing comments in that file. Small, continuous cleanups prevent "technical debt" from accumulating over time.
+
+### Q67: Why is it critical to remove "dead code" (like temporary test routes or unused variables) before merging to the production `main` branch?
+* **Answer:** 
+  "Dead code" creates severe confusion and maintenance overhead. If a new developer inherits a codebase and sees a route like `/api/test`, they won't know if it is safe to delete or if some critical system secretly relies on it. Furthermore, temporary testing routes often bypass security protocols (like authentication or rate limiting), creating massive security vulnerabilities if pushed to production. Dead code should always be deleted before a PR is merged.
+
 ---
 *End of Month 1 Project 1 Interview Notes.*
