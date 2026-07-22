@@ -22,7 +22,9 @@ Welcome to the Task Manager API project! This repository documents my daily prog
 - [x] **Day 16:** Handling File Uploads (Multer) 
 - [x] **Day 17:** API Rate Limiting (preventing spam) **[Git Flow: `feature/rate-limiting`]** 
 - [x] **Day 18:** Refactoring code for best practices (DRY principle)
-- [x] **Day 19:** Swagger API Documentation (Generating Interactive Docs)
+- [x] **Day 19:** Swagger API Documentation (Generating Interactive Docs) 
+- [x] **Day 20:** Code Cleanup & Final Review
+
 
 ## 📁 Repository Structure
 - `/src`: Contains all the application code (controllers, routes, middlewares).

@@ -176,9 +176,5 @@ router.put('/:id', upload.single('image'), updateTask);
  */
 router.delete('/:id', deleteTask);
 
-// TEMPORARY ROUTE TO TEST ERROR HANDLING
-router.get('/error/test', (req, res, next) => {
-    next(new Error("BOOM! The database exploded!"));
-});
-
 export default router;
+

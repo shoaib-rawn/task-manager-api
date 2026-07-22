@@ -28,8 +28,8 @@
 - `[x]` **Day 16:** Handling File Uploads (attaching a file/image to a task) **[Git Flow: `feature/file-upload`]**
 - `[x]` **Day 17:** API Rate Limiting (preventing spam) **[Git Flow: `feature/rate-limiting`]**
 - `[x]` **Day 18:** Refactoring code for best practices (DRY principle) **[Git Flow: `feature/refactoring`]**
-- `[ ]` **Day 19:** Writing API Documentation (Swagger/Postman docs) **[Git Flow: `feature/swagger-docs`]**
-- `[ ]` **Day 20:** Project Review & Code Cleanup
-- `[ ]` **Week 4 Revision:** Final Month 1 Project review, API docs, rate limits, and push to GitHub
+- `[x]` **Day 19:** Writing API Documentation (Swagger/Postman docs) **[Git Flow: `feature/swagger-docs`]**
+- `[x]` **Day 20:** Project Review & Code Cleanup
+- `[x]` **Week 4 Revision:** Final Month 1 Project review, API docs, rate limits, and push to GitHub
 
 *(Days 21-30 are reserved for Month 2: E-Commerce API Database Integration)*
