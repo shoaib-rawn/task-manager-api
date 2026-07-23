@@ -14,6 +14,10 @@ const options = {
       {
         url: 'http://localhost:5000',
       },
+      {
+        url: 'https://task-manager.onrender.com',   // ← yahan apna Render URL daalna
+        description: 'Production (Render)'
+      }
     ],
   },
   apis: ['./src/routes/*.ts'], // Path to the API routes files
